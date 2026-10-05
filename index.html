@@ -7,6 +7,12 @@
     <link rel="manifest" href="manifest.json">
     <link rel="stylesheet" href="style.css">
     
+    <script>
+        window.onerror = function(message, source, lineno, colno, error) {
+            document.body.innerHTML += `<div style="position:fixed;top:0;left:0;right:0;background:red;color:white;z-index:99999;padding:20px;">Error: ${message} at line ${lineno}</div>`;
+        };
+    </script>
+
     <!-- App Icons for iOS & Android -->
     <link rel="apple-touch-icon" href="icon.jpg">
     <link rel="icon" type="image/jpeg" href="icon.jpg">
