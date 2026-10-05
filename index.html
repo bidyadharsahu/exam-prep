@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>ExamNova Commerce</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- App Icons for iOS & Android -->
+    <link rel="apple-touch-icon" href="icon.jpg">
+    <link rel="icon" type="image/jpeg" href="icon.jpg">
+    
+    <!-- Phosphor Icons for a clean, modern iOS feel -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <meta name="theme-color" content="#5E5CE6">
+    
+    <!-- Supabase JS Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+    <!-- Supabase Initialization & Loader -->
+    <div id="loader" class="loader-container">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Login Screen -->
+    <div id="login-screen" class="screen">
+        <div class="glass-container login-container slide-up-anim">
+            <div class="logo">
+                <!-- Swapped to a book icon for the new logo theme -->
+                <i class="ph-duotone ph-book-open-text"></i>
+            </div>
+            <h1>ExamNova</h1>
+            <p>Ready to conquer your boards?</p>
+            
+            <div class="input-group">
+                <i class="ph ph-lock"></i>
+                <input type="password" id="passcode-input" placeholder="Passcode (Default: 1234)">
+            </div>
+            <p id="login-error" class="error-msg"></p>
+            
+            <button class="btn primary-btn pulse-btn" onclick="app.login()">Sign In</button>
+            <button class="btn text-btn" onclick="app.showResetScreen()">Reset Passcode</button>
+            
+            <div class="footer-note">
+                <button class="btn outline-btn smaile-btn" onclick="alert('Keep smiling and studying hard! You got this.')">designed for smaile...</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reset Passcode Screen -->
+    <div id="reset-screen" class="screen">
+        <div class="glass-container login-container slide-up-anim">
+            <h2>Reset Passcode</h2>
+            <div class="input-group">
+                <i class="ph ph-lock-key"></i>
+                <input type="password" id="new-passcode" placeholder="New Passcode">
+            </div>
+            <div class="input-group">
+                <i class="ph ph-lock-key"></i>
+                <input type="password" id="confirm-passcode" placeholder="Confirm Passcode">
+            </div>
+            <p id="reset-error" class="error-msg"></p>
+            
+            <button class="btn primary-btn" onclick="app.resetPasscode()">Save Changes</button>
+            <button class="btn text-btn" onclick="app.showLoginScreen()">Back to Login</button>
+        </div>
+    </div>
+
+    <!-- Main App Screen (Dashboard) -->
+    <div id="main-screen" class="screen">
+        <header class="glass-header">
+            <div class="header-content">
+                <div class="user-profile">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Commerce" alt="Avatar">
+                    <div>
+                        <p class="greeting">Hello, Champion 👋</p>
+                        <h2>Let's Study</h2>
+                    </div>
+                </div>
+                <button class="icon-btn" onclick="app.logout()"><i class="ph ph-sign-out"></i></button>
+            </div>
+        </header>
+
+        <main class="dashboard scroll-area">
+            <div class="hero-banner">
+                <div class="hero-content">
+                    <h3>Mock Tests Live!</h3>
+                    <p>Check out the new exam-pattern mock tests.</p>
+                </div>
+                <i class="ph-duotone ph-rocket"></i>
+            </div>
+
+            <h3 class="section-title">Your Subjects</h3>
+            <div class="subject-grid" id="subject-grid">
+                <!-- Dynamically populated -->
+            </div>
+        </main>
+        
+        <!-- Telegram Floating Button -->
+        <a href="https://t.me/your_channel" target="_blank" class="fab telegram-fab">
+            <i class="ph-fill ph-telegram-logo"></i>
+        </a>
+
+        <!-- iOS Style Bottom Navigation -->
+        <nav class="bottom-nav">
+            <div class="nav-item active" onclick="app.showMainScreen()">
+                <i class="ph-fill ph-house"></i>
+                <span>Home</span>
+            </div>
+            <div class="nav-item" onclick="alert('Coming soon!')">
+                <i class="ph ph-chart-line-up"></i>
+                <span>Analytics</span>
+            </div>
+            <div class="nav-item" onclick="app.showMainScreen()">
+                <i class="ph ph-books"></i>
+                <span>Library</span>
+            </div>
+        </nav>
+    </div>
+
+    <!-- Subject Details Screen -->
+    <div id="subject-screen" class="screen">
+        <header class="glass-header">
+            <div class="header-content align-center">
+                <button class="icon-btn" onclick="app.showMainScreen()"><i class="ph ph-caret-left"></i></button>
+                <h2 id="subject-title" style="margin: 0;">Subject</h2>
+                <div style="width: 40px;"></div>
+            </div>
+        </header>
+        
+        <main class="subject-content scroll-area pb-nav">
+            <!-- Tabs - horizontal scroll -->
+            <div class="tabs-container">
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="app.switchTab('youtube')">Classes</button>
+                    <button class="tab-btn" onclick="app.switchTab('pyq')">PYQs</button>
+                    <button class="tab-btn" onclick="app.switchTab('mocktest')">Mock Tests</button>
+                    <button class="tab-btn" onclick="app.switchTab('quizzes')">Quizzes</button>
+                </div>
+            </div>
+
+            <!-- Tab Content Area -->
+            <div id="tab-content" class="tab-content-area slide-in-right">
+                <!-- Dynamically populated based on active tab -->
+            </div>
+        </main>
+        
+        <nav class="bottom-nav">
+            <div class="nav-item" onclick="app.showMainScreen()">
+                <i class="ph ph-house"></i>
+                <span>Home</span>
+            </div>
+            <div class="nav-item active">
+                <i class="ph-fill ph-book-open"></i>
+                <span>Subject</span>
+            </div>
+        </nav>
+    </div>
+
+    <!-- Modals (Bottom Sheets) -->
+    <div id="test-modal" class="modal-overlay" onclick="app.closeModal(event)">
+        <div class="bottom-sheet">
+            <div class="sheet-handle"></div>
+            <h3 id="modal-title">Mock Test</h3>
+            <p id="modal-desc" class="text-muted">Loading...</p>
+            <div class="modal-actions">
+                <button class="btn primary-btn" onclick="app.startMockTest()">Start Now</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quiz Active Screen -->
+    <div id="quiz-screen" class="screen">
+        <header class="glass-header">
+            <div class="header-content align-center">
+                <button class="icon-btn" onclick="app.endQuizEarly()"><i class="ph ph-x"></i></button>
+                <h2 id="quiz-title" style="margin: 0; font-size: 1.1rem;">Quiz</h2>
+                <div class="quiz-timer" id="quiz-timer">00:00</div>
+            </div>
+        </header>
+        
+        <main class="quiz-content scroll-area pb-nav" style="padding: 20px;">
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="quiz-progress"></div>
+            </div>
+            <p class="question-tracker" id="question-tracker">Question 1 of 10</p>
+            
+            <div class="question-container glass-container" style="padding: 20px; border-radius: 16px; margin-top: 15px;">
+                <h3 id="question-text" style="font-size: 1.2rem; margin-bottom: 20px;">Loading question...</h3>
+                <div id="options-container" class="options-container">
+                    <!-- Options injected here -->
+                </div>
+            </div>
+        </main>
+        
+        <div class="bottom-action-bar">
+            <button class="btn outline-btn" id="prev-btn" onclick="app.prevQuestion()">Previous</button>
+            <button class="btn primary-btn" id="next-btn" onclick="app.nextQuestion()">Next</button>
+        </div>
+    </div>
+
+    <!-- Quiz Result Screen -->
+    <div id="result-screen" class="screen">
+        <main class="result-content scroll-area" style="display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; text-align: center;">
+            <div class="trophy-icon" style="font-size: 5rem; color: #FFCC00; margin-bottom: 15px;">
+                <i class="ph-fill ph-trophy"></i>
+            </div>
+            <h1 style="font-size: 2rem; margin-bottom: 10px;">Quiz Complete!</h1>
+            <p class="text-muted">Here's how you performed.</p>
+            
+            <div class="score-card glass-container" style="margin-top: 25px; padding: 30px; border-radius: 20px; width: 100%;">
+                <h2 style="font-size: 3rem; color: var(--primary-color);" id="score-display">0/0</h2>
+                <p style="font-weight: 600; margin-top: 5px;">Correct Answers</p>
+                <div id="score-message" style="margin-top: 15px; color: var(--text-muted);">Good job! Keep practicing.</div>
+            </div>
+            
+            <button class="btn primary-btn pulse-btn" style="margin-top: 30px;" onclick="app.showSubjectScreen()">Back to Subject</button>
+        </main>
+    </div>
+
+    <!-- Video Player Screen -->
+    <div id="video-screen" class="screen">
+        <header class="glass-header">
+            <div class="header-content align-center">
+                <button class="icon-btn" onclick="app.closeVideoPlayer()"><i class="ph ph-caret-down"></i></button>
+                <h2 id="video-title" style="margin: 0; font-size: 1.1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 70%;">Now Playing</h2>
+                <div style="width: 40px;"></div>
+            </div>
+        </header>
+        <main class="video-content scroll-area" style="padding: 0;">
+            <div class="video-wrapper" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
+                <iframe id="youtube-player" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+            <div class="video-info" style="padding: 20px;">
+                <h3 id="video-info-title" style="margin-bottom: 10px;">Video Title</h3>
+                <p id="video-info-channel" class="text-muted" style="margin-bottom: 20px; font-weight: 500;">Channel Name</p>
+                <div class="glass-container" style="padding: 15px; border-radius: 12px; font-size: 0.9rem;">
+                    <i class="ph-duotone ph-lightbulb" style="color: #FFCC00; font-size: 1.2rem; margin-bottom: 5px;"></i>
+                    <p>Pro Tip: Watch this video in landscape mode for the best experience. Take notes as you watch!</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Install App Banner (PWA) -->
+    <div id="install-banner" class="install-banner">
+        <div class="install-content">
+            <div class="install-icon">
+                <i class="ph-duotone ph-download-simple"></i>
+            </div>
+            <div class="install-text">
+                <h4>Download ExamNova</h4>
+                <p>Install our app for a faster, offline experience!</p>
+            </div>
+            <div class="install-actions">
+                <button class="btn primary-btn small-btn" onclick="app.installApp()">Install</button>
+                <button class="icon-btn close-install" onclick="app.closeInstallBanner()"><i class="ph ph-x"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js');
+            });
+        }
+    </script>
+</body>
+</html>
