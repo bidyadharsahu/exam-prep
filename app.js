@@ -12,10 +12,20 @@ const App = {
         isLoggedIn: sessionStorage.getItem('isLoggedIn') === 'true',
         currentSubject: null,
         activeMockTest: null,
-        deferredPrompt: null
+        deferredPrompt: null,
+        theme: localStorage.getItem('app_theme') || 'system'
     },
 
     init() {
+        this.applyTheme(this.state.theme);
+
+        // Listen for system theme changes
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+            if (this.state.theme === 'system') {
+                this.applyTheme('system');
+            }
+        });
+
         // PWA Install Prompt Logic
         window.addEventListener('beforeinstallprompt', (e) => {
             // Prevent the mini-infobar from appearing on mobile
@@ -114,6 +124,43 @@ const App = {
         this.showLoginScreen();
     },
 
+    // --- Theme Logic ---
+    applyTheme(themeValue) {
+        let isDark = false;
+        const iconEl = document.getElementById('theme-icon');
+        
+        if (themeValue === 'system') {
+            isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if(iconEl) {
+                iconEl.className = 'ph ph-desktop';
+            }
+        } else if (themeValue === 'dark') {
+            isDark = true;
+            if(iconEl) iconEl.className = 'ph-fill ph-moon';
+        } else {
+            isDark = false;
+            if(iconEl) iconEl.className = 'ph-fill ph-sun';
+        }
+
+        if (isDark) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            document.querySelector('meta[name="theme-color"]').setAttribute("content", "#000000");
+        } else {
+            document.documentElement.removeAttribute('data-theme');
+            document.querySelector('meta[name="theme-color"]').setAttribute("content", "#5E5CE6");
+        }
+    },
+
+    toggleTheme() {
+        const themes = ['system', 'light', 'dark'];
+        const currentIndex = themes.indexOf(this.state.theme);
+        const nextTheme = themes[(currentIndex + 1) % themes.length];
+        
+        this.state.theme = nextTheme;
+        localStorage.setItem('app_theme', nextTheme);
+        this.applyTheme(nextTheme);
+    },
+
     renderSubjects() {
         const grid = document.getElementById('subject-grid');
         grid.innerHTML = '';
@@ -191,16 +238,16 @@ const App = {
 
             if (tabId === 'youtube') {
                 icon = 'ph-youtube-logo'; iconClass = 'yt';
-                title = item.channel; subtitle = item.type;
+                title = item.title; subtitle = item.channel;
             } else if (tabId === 'pyq') {
                 icon = 'ph-file-pdf'; iconClass = 'pdf';
-                title = item.title; subtitle = \`Year: \${item.year}\`;
+                title = item.title; subtitle = `Year: ${item.year}`;
             } else if (tabId === 'mocktest') {
                 icon = 'ph-exam'; iconClass = 'mock';
-                title = item.title; subtitle = \`\${item.desc} • \${item.time}\`;
+                title = item.title; subtitle = `${item.desc} • ${item.time}`;
             } else if (tabId === 'quizzes') {
                 icon = 'ph-question'; iconClass = 'quiz';
-                title = item.title; subtitle = \`\${item.qcount} Questions\`;
+                title = item.title; subtitle = `${item.qcount} Questions`;
             }
 
             el.innerHTML = `
@@ -223,7 +270,7 @@ const App = {
         
         // Set youtube iframe src with optimal parameters for mobile (rel=0 avoids random recommendations, modestbranding reduces YT logos, playsinline=1 allows in-app play)
         const iframe = document.getElementById('youtube-player');
-        iframe.src = \`https://www.youtube.com/embed/\${videoItem.videoId}?autoplay=1&rel=0&modestbranding=1&playsinline=1\`;
+        iframe.src = `https://www.youtube.com/embed/\${videoItem.videoId}?autoplay=1&rel=0&modestbranding=1&playsinline=1`;
         
         this.showScreen('video-screen');
     },
@@ -239,7 +286,7 @@ const App = {
     openMockModal(test) {
         this.state.activeMockTest = test;
         document.getElementById('modal-title').innerText = test.title;
-        document.getElementById('modal-desc').innerText = \`\${test.desc} | Duration: \${test.time}\`;
+        document.getElementById('modal-desc').innerText = `\${test.desc} | Duration: \${test.time}`;
         document.getElementById('test-modal').classList.add('active');
     },
 
@@ -259,7 +306,7 @@ const App = {
             if (this.state.activeMockTest.id && this.state.activeMockTest.id.startsWith('quiz_')) {
                 this.startInteractiveQuiz(this.state.activeMockTest);
             } else {
-                alert(\`Started Mock Test: \${this.state.activeMockTest.title}.\\n(Note: This would redirect to the actual test environment)\`);
+                alert(`Started Mock Test: \${this.state.activeMockTest.title}.\\n(Note: This would redirect to the actual test environment)`);
             }
         }, 800);
     },
@@ -302,7 +349,7 @@ const App = {
             this.quizState.timeElapsed++;
             const m = Math.floor(this.quizState.timeElapsed / 60).toString().padStart(2, '0');
             const s = (this.quizState.timeElapsed % 60).toString().padStart(2, '0');
-            timerEl.innerText = \`\${m}:\${s}\`;
+            timerEl.innerText = `\${m}:\${s}`;
         }, 1000);
     },
 
@@ -312,8 +359,8 @@ const App = {
         const qData = this.quizState.questions[qIndex];
         
         // Progress & Tracker
-        document.getElementById('quiz-progress').style.width = \`\${((qIndex + 1) / total) * 100}%\`;
-        document.getElementById('question-tracker').innerText = \`Question \${qIndex + 1} of \${total}\`;
+        document.getElementById('quiz-progress').style.width = `\${((qIndex + 1) / total) * 100}%`;
+        document.getElementById('question-tracker').innerText = `Question \${qIndex + 1} of \${total}`;
         
         // Text
         document.getElementById('question-text').innerText = qData.q;
@@ -325,13 +372,13 @@ const App = {
         qData.options.forEach((opt, idx) => {
             const isSelected = this.quizState.userAnswers[qIndex] === idx;
             const optEl = document.createElement('div');
-            optEl.className = \`quiz-option \${isSelected ? 'selected' : ''}\`;
+            optEl.className = `quiz-option \${isSelected ? 'selected' : ''}`;
             optEl.onclick = () => this.selectQuizOption(idx);
             
-            optEl.innerHTML = \`
+            optEl.innerHTML = `
                 <span>\${opt}</span>
                 <i class="ph-fill ph-check-circle" style="color: \${isSelected ? 'var(--primary-color)' : 'transparent'}; font-size: 1.2rem;"></i>
-            \`;
+            `;
             optionsContainer.appendChild(optEl);
         });
 
@@ -388,7 +435,7 @@ const App = {
         const percentage = (score / total) * 100;
         
         // Render Results
-        document.getElementById('score-display').innerText = \`\${score}/\${total}\`;
+        document.getElementById('score-display').innerText = `\${score}/\${total}`;
         
         const msgEl = document.getElementById('score-message');
         if (percentage === 100) msgEl.innerText = "Flawless victory! Outstanding!";
