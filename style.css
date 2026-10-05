@@ -421,3 +421,5 @@ body {
 .install-actions { display: flex; align-items: center; gap: 10px; margin-left: 10px; flex-shrink: 0; }
 .small-btn { padding: 8px 16px; font-size: 0.85rem; border-radius: 10px; margin-top: 0; width: auto; }
 .close-install { width: 30px; height: 30px; font-size: 1rem; border: none; background: transparent; }
+
+[data-theme="dark"] .input-group input:focus { background: #3A3A3C; color: #FFF; border-color: var(--primary-color); }

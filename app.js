@@ -223,9 +223,16 @@ const app = {
             const el = document.createElement('a');
             el.className = 'list-item';
             
-            if (tabId === 'mocktest') {
+            if (tabId === 'mocktest' || tabId === 'quizzes') {
                 el.href = '#';
-                el.onclick = (e) => { e.preventDefault(); this.openMockModal(item); };
+                el.onclick = (e) => { 
+                    e.preventDefault(); 
+                    if (item.id && item.id.startsWith('quiz_')) {
+                        this.startInteractiveQuiz(item);
+                    } else {
+                        this.openMockModal(item); 
+                    }
+                };
             } else if (tabId === 'youtube') {
                 el.href = '#';
                 el.onclick = (e) => { e.preventDefault(); this.openVideoPlayer(item); };
