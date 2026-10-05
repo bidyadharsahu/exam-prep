@@ -6,7 +6,7 @@ if (window.supabase) {
     supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 }
 
-const App = {
+const app = {
     state: {
         passcode: localStorage.getItem('app_passcode') || '1234',
         isLoggedIn: sessionStorage.getItem('isLoggedIn') === 'true',
