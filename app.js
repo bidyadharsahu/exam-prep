@@ -1,9 +1,9 @@
 // Supabase Configuration
 const SUPABASE_URL = 'https://vtkyhnerfniipqefykat.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_A4hAFGmMGg7_AYVa1GUkhQ_M5OSRkPM';
-let supabase = null;
+let dbClient = null;
 if (window.supabase) {
-    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    dbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 }
 
 const app = {
@@ -444,9 +444,9 @@ const app = {
         else msgEl.innerText = "Keep practicing, you'll get it next time!";
         
         // Log to Supabase (simulated)
-        if(supabase) {
+        if(dbClient) {
             console.log('Logging score to Supabase:', { score, total, subject: this.state.currentSubject });
-            // supabase.from('quiz_results').insert([{ user_id: 'local_user', quiz_id: this.state.activeMockTest.id, score: score, total: total }]);
+            // dbClient.from('quiz_results').insert([{ user_id: 'local_user', quiz_id: this.state.activeMockTest.id, score: score, total: total }]);
         }
 
         this.showScreen('result-screen');
